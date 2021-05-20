@@ -16,13 +16,11 @@ exports.execCmd = ({ cmd, packageCwd }, options = {}) => {
   console.log();
 
   try {
-    // !dryRun && execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
-    const out = execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
-
-    console.log('out:', out);
-    console.log(chalk.green(`[create-test-app] execute \`${cmd}\`✅`));
+    !dryRun && execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
+    // execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
+    console.log(chalk.green(`[create-test-app] execute \`${cmd}\` ✅`));
   } catch (error) {
-    // console.log(chalk.red(`[create-test-app] executed \`${cmd}\` ❌`));
+    console.log(chalk.red(`[create-test-app] executed \`${cmd}\` ❌`));
     console.error(error);
 
     throw error;

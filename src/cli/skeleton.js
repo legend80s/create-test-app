@@ -5,6 +5,7 @@ const { LABEL } = require('../constants');
 const { execCmd } = require('../lib/exec-cmd');
 const { fileExists } = require('../lib/file-exists');
 const { install } = require('../lib/install');
+const { briefPath } = require('../lib/path');
 const { resolvePkgCwd } = require('../lib/resolve-pkg-cwd');
 
 const fsp = fs.promises;
@@ -109,22 +110,28 @@ async function insertCoverageConfig({ packageCwd }, options) {
 
   await fsp.writeFile(pkgFilepath, JSON.stringify(pkg, null, 2));
 
-  const gitignore = (await fsp.readFile(gitignoreFilepath)).toString();
+  let gitignore = '';
+
+  if (fileExists(gitignoreFilepath)) {
+    gitignore = (await fsp.readFile(gitignoreFilepath)).toString();
+  }
 
   if (!gitignore.includes('coverage')) {
     await fsp.appendFile(gitignoreFilepath, 'coverage/');
+
+    console.log(LABEL, 'Add coverage/ to', briefPath(gitignoreFilepath));
   }
 }
 
 async function updateConfig(jestConfigFilepath, config) {
-  const content = (await fsp.readFile(jestConfigFilepath)).toString();
+  let content = (await fsp.readFile(jestConfigFilepath)).toString();
 
   Object.keys(config).forEach(key => {
     const val = config[key];
 
     if (!content.includes(key)) {
       content = content.replace('module.exports = {', `module.exports = {
-  ${key}: ${val.includes('{') ? val: "'" + val + "'"}`);
+  ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
     }
   });
 
