@@ -4,7 +4,9 @@
   "description": "A scaffolding CLI to make your project tested by Jest and with coverage enabled.",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest"
+    "preversion": "npm test",
+    "postversion": "npm publish && git push && git push --tags",
+    "test": "cd ./test/e2e && node ../../ --type ts && npm test"
   },
   "bin": {
     "create-test-app": "src/index.js",
