@@ -1,5 +1,6 @@
 const { CLI } = require('cli-aid');
 const { createTSTestSkeleton, createJSTestSkeleton } = require('./cli/skeleton');
+const pkg = require('../package.json');
 
 /**
  * @type {IOptions}
@@ -29,6 +30,8 @@ verbose && console.log('options:', options);
 
 if (type === 'ts') {
   createTSTestSkeleton(options);
-} else {
+} else if (type === 'js') {
   createJSTestSkeleton(options);
+} else {
+  console.error('[create-test-app] Invalid type, should be one of [ts, js].')
 }

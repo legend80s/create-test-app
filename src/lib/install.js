@@ -5,8 +5,7 @@ const chalk = require('chalk');
 
 const { hasYarn } = require('./has-yarn.js');
 const { briefPath } = require('./path.js');
-
-exports.install = install;
+const { LABEL } = require('../constants.js');
 
 /**
  *
@@ -14,7 +13,7 @@ exports.install = install;
  * @param {{ forceInstall: boolean; }} options
  * @returns
  */
-async function install({ packageCwd, dependencies = [], devDependencies = [] }, options) {
+exports.install = async function install({ packageCwd, dependencies = [], devDependencies = [] }, options) {
   const { forceInstall, dryRun } = options;
 
   // console.log('forceInstall:', forceInstall);
@@ -22,7 +21,7 @@ async function install({ packageCwd, dependencies = [], devDependencies = [] }, 
   const uninstalled = getUninstalled(packageCwd, dependencies.concat(devDependencies), options);
 
   if (!forceInstall && uninstalled.length === 0) {
-    console.log(chalk.green('[paytm] 检测到依赖已安装，无需继续安装'));
+    console.log(chalk.green(`${LABEL} 检测到依赖已安装，无需继续安装`));
 
     return;
   }
@@ -32,29 +31,29 @@ async function install({ packageCwd, dependencies = [], devDependencies = [] }, 
   const cmd = [devCmd, prodCmd].filter(Boolean).join(' && ');
 
   if (!cmd) {
-    console.error(chalk.red('[paytm] 依赖入参不能同时为空，安装终止'));
+    console.error(chalk.red(`${LABEL} 依赖入参不能同时为空，安装终止`));
 
     return;
   }
 
-  console.log('[paytm] 正在目录', chalk.green(briefPath(packageCwd)), '下安装依赖 🚀 ');
-  console.time('[paytm] 安装依赖');
+  console.log(`${LABEL} 正在目录`, chalk.green(briefPath(packageCwd)), '下安装依赖 🚀 ');
+  console.time(`${LABEL} 安装依赖`);
   console.log(chalk.green('  ', cmd));
   console.log();
 
   try {
     !dryRun && execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
-    console.log('[paytm] 安装依赖成功 ✅');
+    console.log(`${LABEL} 安装依赖成功 ✅`);
 
     return true;
   } catch (error) {
-    console.log('[paytm] 安装依赖失败 ❌');
+    console.log(`${LABEL} 安装依赖失败 ❌`);
     console.error(chalk.red(cmd, 'failed:'));
     console.error(error);
 
     return false;
   } finally {
-    console.timeEnd('[paytm] 安装依赖');
+    console.timeEnd(`${LABEL} 安装依赖`);
 
     console.log();
   }

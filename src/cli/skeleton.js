@@ -1,9 +1,11 @@
 const chalk = require('chalk')
 const fs = require('fs')
-const { join, resolve } = require('fs')
+const { join } = require('path');
+const { LABEL } = require('../constants');
 const { execCmd } = require('../lib/exec-cmd');
 const { fileExists } = require('../lib/file-exists');
-const { install } = require('../lib/install')
+const { install } = require('../lib/install');
+const { resolvePkgCwd } = require('../lib/resolve-pkg-cwd');
 
 const fsp = fs.promises;
 
@@ -13,6 +15,9 @@ const tsDevDependencies = [
   '@types/jest',
 ];
 
+const packageCwd = resolvePkgCwd();
+const jestConfigFilepath = join(packageCwd, 'jest.config.js');
+
 /**
  *
  * @param {IOptions} options
@@ -20,13 +25,19 @@ const tsDevDependencies = [
 exports.createTSTestSkeleton = async (options) => {
   const { coverage } = options;
 
-  const packageCwd = resolve('package.json');
+  console.log('[create-test-app] Project root:', chalk.green(packageCwd));
 
-  console.time('create test skeleton for TypeScript project costs')
+  const timeLabel = '[create-test-app] create test skeleton for TypeScript project costs'
+  console.time(timeLabel)
 
   try {
     await install({ packageCwd, devDependencies: tsDevDependencies }, options);
-    execCmd('npx ts-jest config:init');
+
+    if (!fileExists(jestConfigFilepath)) {
+      execCmd({ cmd: 'npx ts-jest config:init', packageCwd }, options);
+    } else {
+      console.log(`${LABEL}`, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
+    }
 
     if (coverage) {
       await insertCoverageConfig({ packageCwd }, options);
@@ -40,7 +51,7 @@ exports.createTSTestSkeleton = async (options) => {
     console.error(chalk.red(error));
     console.error(error);
   } finally {
-    console.timeEnd('[create-test-app] create test skeleton for TypeScript project costs')
+    console.timeEnd(timeLabel)
   }
 }
 
@@ -55,7 +66,6 @@ exports.createJSTestSkeleton = (options) => {
  * @param {IOptions} options
  */
 async function insertCoverageConfig({ packageCwd }, options) {
-  const jestConfigFilepath = join(packageCwd, 'jest.config.js');
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
 
@@ -85,6 +95,9 @@ async function insertCoverageConfig({ packageCwd }, options) {
   coverageThreshold: ${config.coverageThreshold},
 }
 `
+    console.log(LABEL, 'jest.config.js not exists. Written with:');
+    console.log(content);
+
     await fsp.writeFile(jestConfigFilepath, content);
   } else {
     await updateConfig(jestConfigFilepath, config);
@@ -92,11 +105,15 @@ async function insertCoverageConfig({ packageCwd }, options) {
 
   const pkg = JSON.parse((await fsp.readFile(pkgFilepath)).toString());
 
-  pkg.test = 'jest --coverage';
+  pkg.scripts.test = 'jest --coverage';
 
-  await fsp.writeFile(pkgFilepath, JSON.stringify(pkg));
+  await fsp.writeFile(pkgFilepath, JSON.stringify(pkg, null, 2));
 
-  await fsp.appendFile(gitignoreFilepath, 'coverage/');
+  const gitignore = (await fsp.readFile(gitignoreFilepath)).toString();
+
+  if (!gitignore.includes('coverage')) {
+    await fsp.appendFile(gitignoreFilepath, 'coverage/');
+  }
 }
 
 async function updateConfig(jestConfigFilepath, config) {
@@ -111,7 +128,8 @@ async function updateConfig(jestConfigFilepath, config) {
     }
   });
 
-  console.log('Overwrite jest.config.js with content', content);
+  console.log(LABEL, 'jest.config.js exists. Overwrite with:');
+  console.log(content);
 
   await fsp.writeFile(jestConfigFilepath, content);
 }
