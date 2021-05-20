@@ -1,0 +1,35 @@
+{
+  "name": "create-test-app",
+  "version": "0.0.0",
+  "description": "A scaffolding CLI to make your project tested by Jest and with coverage enabled.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "bin": {
+    "create-test-app": "src/index.js",
+    "cta": "src/index.js"
+  },
+  "tnpm": {
+    "mode": "yarn",
+    "lockfile": "enable"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/legend80s/create-test-app.git"
+  },
+  "author": "legend80s",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/legend80s/create-test-app/issues"
+  },
+  "homepage": "https://github.com/legend80s/create-test-app#readme",
+  "devDependencies": {
+    "git-commit-msg-linter": "^3.1.0"
+  },
+  "dependencies": {
+    "chalk": "^4.1.1",
+    "cli-aid": "^6.4.0",
+    "has-yarn": "^2.1.0"
+  }
+}
