@@ -1,0 +1,15 @@
+{
+  "name": "e2e-js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
