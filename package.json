@@ -10,8 +10,8 @@
     "preversion": "npm test",
     "postversion": "npm publish && git push && git push --tags",
     "test": "npm run test:js && npm run test:ts",
-    "test:js": "cd ./test/e2e-js && node ../../ -- -t js && npm test && cd -",
-    "test:ts": "cd ./test/e2e-ts && node ../../ -- -t ts && npm test && cd -"
+    "test:js": "cd test/e2e-js && rm -rf node_modules && node ../../ --type js && npm test && cd -",
+    "test:ts": "cd test/e2e-ts && rm -rf node_modules && node ../../ --type ts && npm test && cd -"
   },
   "bin": {
     "create-test-app": "src/index.js",
@@ -37,6 +37,7 @@
   "dependencies": {
     "chalk": "^4.1.1",
     "cli-aid": "^6.4.0",
+    "command-exists": "^1.2.9",
     "has-yarn": "^2.1.0"
   }
 }

@@ -29,6 +29,9 @@ const { type, verbose } = options;
 
 verbose && console.log('options:', options);
 
+// console.log('options:', options);
+// process.exit(0)
+
 if (type === 'ts') {
   console.log(chalk.cyan('[create-test-app] Arming TypeScript project with Jest.'))
 

@@ -6,6 +6,7 @@ const chalk = require('chalk');
 const { hasYarn } = require('./has-yarn.js');
 const { briefPath } = require('./path.js');
 const { LABEL } = require('../constants.js');
+const { resolveInstallerName } = require('./resolve-installer.js');
 
 /**
  *
@@ -26,8 +27,10 @@ exports.install = async function install({ packageCwd, dependencies = [], devDep
     return;
   }
 
-  const devCmd = genInstallCmd(devDependencies, 'dev', packageCwd);
-  const prodCmd = genInstallCmd(dependencies, 'prod', packageCwd);
+  const pmName = resolveInstallerName();
+
+  const devCmd = genInstallCmd({ pmName, dependencies: devDependencies, scope: 'dev', packageCwd});
+  const prodCmd = genInstallCmd({ pmName, dependencies, scope: 'prod', packageCwd });
   const cmd = [devCmd, prodCmd].filter(Boolean).join(' && ');
 
   if (!cmd) {
@@ -36,24 +39,24 @@ exports.install = async function install({ packageCwd, dependencies = [], devDep
     return;
   }
 
-  console.log(`${LABEL} 正在目录`, chalk.green(briefPath(packageCwd)), '下安装依赖 🚀 ');
-  console.time(`${LABEL} 安装依赖`);
+  console.log(`${LABEL} Installing to`, chalk.green(briefPath(packageCwd)), '🚀 ');
+  console.time(`${LABEL} Install packages costs`);
   console.log(chalk.green('  ', cmd));
   console.log();
 
   try {
     !dryRun && execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
-    console.log(`${LABEL} 安装依赖成功 ✅`);
+    console.log(`${LABEL} Install success ✅`);
 
     return true;
   } catch (error) {
-    console.log(`${LABEL} 安装依赖失败 ❌`);
+    console.log(`${LABEL} Install failed ❌`);
     console.error(chalk.red(cmd, 'failed:'));
     console.error(error);
 
     return false;
   } finally {
-    console.timeEnd(`${LABEL} 安装依赖`);
+    console.timeEnd(`${LABEL} Install packages costs`);
 
     console.log();
   }
@@ -80,11 +83,10 @@ function getUninstalled(packageCwd, dependencies, options) {
 
 /**
  *
- * @param {string[]} dependencies
- * @param {'dev' | 'prod'} scope
+ * @param 'dev' | 'prod' options.scope
  * @returns {string}
  */
-function genInstallCmd(dependencies, scope, packageCwd) {
+function genInstallCmd({ pmName, dependencies, scope, packageCwd }) {
   if (isEmpty(dependencies)) {
     return '';
   }
@@ -99,10 +101,10 @@ function genInstallCmd(dependencies, scope, packageCwd) {
     prod: '',
   };
 
-  let installOptions = ['tnpm install', ...dependencies, npmMapping[scope]];
+  let installOptions = [pmName === 'yarn' ? 'yarn add' : `${pmName} install`, ...dependencies, npmMapping[scope]];
 
   if (hasYarn(packageCwd)) {
-    installOptions = ['tnpm install', ...dependencies, yarnMapping[scope]];
+    installOptions = [pmName === 'yarn' ? 'yarn add' : `${pmName} install`, ...dependencies, yarnMapping[scope]];
   }
 
   return installOptions.join(' ');

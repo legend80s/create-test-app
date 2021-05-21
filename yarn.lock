@@ -70,6 +70,11 @@ color-name@~1.1.4:
   resolved "https://registry.npm.alibaba-inc.com/color-name/download/color-name-1.1.4.tgz#c2a09a87acbde69543de6f63fa3995c826c536a2"
   integrity sha1-wqCah6y95pVD3m9j+jmVyCbFNqI=
 
+command-exists@^1.2.9:
+  version "1.2.9"
+  resolved "https://registry.npm.alibaba-inc.com/command-exists/download/command-exists-1.2.9.tgz#c50725af3808c8ab0260fd60b01fbfa25b954f69"
+  integrity sha1-xQclrzgIyKsCYP1gsB+/oluVT2k=
+
 did-you-mean@^0.0.1:
   version "0.0.1"
   resolved "https://registry.npm.alibaba-inc.com/did-you-mean/download/did-you-mean-0.0.1.tgz#8851ce82407903cb62c12cb6ad4f676921ccdec3"

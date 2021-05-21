@@ -33,7 +33,7 @@ const TYPE_MAPPING = {
  *
  * @param {IOptions} options
  */
-function createTestSkeleton(options) {
+async function createTestSkeleton(options) {
   const { coverage, type } = options;
 
   console.log(LABEL, 'Project root:', chalk.green(packageCwd));
@@ -55,17 +55,19 @@ function createTestSkeleton(options) {
     if (coverage) {
       await insertCoverageConfig({ packageCwd }, options);
     }
-
-    console.log(LABEL, 'Run test:')
-    console.log(chalk.green('  npm test'));
-    console.log();
-    console.log(chalk.green(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/'));
   } catch (error) {
     console.error(chalk.red(error));
     console.error(error);
+
+    return;
   } finally {
     console.timeEnd(timeLabel)
   }
+
+  console.log(LABEL, 'Run test:')
+  console.log(chalk.green('  npm test'));
+  console.log();
+  console.log(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/');
 }
 
 /**
@@ -93,7 +95,7 @@ async function insertCoverageConfig({ packageCwd }, options) {
   const gitignoreFilepath = join(packageCwd, '.gitignore');
 
   const config = {
-    preset: type === 'ts' ? 'ts-jest' : undefined,
+    preset: type === 'ts' ? 'ts-jest' : '',
     testEnvironment: 'node',
 
     coverageDirectory: 'coverage',
