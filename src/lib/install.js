@@ -22,7 +22,7 @@ exports.install = async function install({ packageCwd, dependencies = [], devDep
   const uninstalled = getUninstalled(packageCwd, dependencies.concat(devDependencies), options);
 
   if (!forceInstall && uninstalled.length === 0) {
-    console.log(chalk.green(`${LABEL} 检测到依赖已安装，无需继续安装`));
+    console.log(LABEL, chalk.green(`All the dependencies has been installed already. Stop installing`));
 
     return;
   }

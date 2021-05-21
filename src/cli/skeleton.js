@@ -161,10 +161,12 @@ async function updateConfig(jestConfigFilepath, config) {
   const content = (await fsp.readFile(jestConfigFilepath)).toString();
   let newContent = content;
 
+  const configObj = require(jestConfigFilepath);
+
   Object.keys(config).forEach(key => {
     const val = config[key];
 
-    if (!content.includes(key)) {
+    if (typeof configObj[key] === 'undefined') {
       newContent = newContent.replace('module.exports = {', `module.exports = {
   ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
     }
