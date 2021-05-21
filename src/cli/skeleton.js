@@ -30,6 +30,13 @@ const TYPE_MAPPING = {
 }
 
 /**
+ * @param {IOptions} options
+ */
+function isTS(options) {
+  return options.type === 'ts';
+}
+
+/**
  *
  * @param {IOptions} options
  */
@@ -42,7 +49,10 @@ async function createTestSkeleton(options) {
   console.time(timeLabel)
 
   try {
-    await install({ packageCwd, devDependencies: tsDevDependencies }, options);
+    await install({
+      packageCwd,
+      devDependencies: isTS(options) ? tsDevDependencies : jsDevDependencies
+    }, options);
 
     if (type === 'ts') {
       if (!fileExists(jestConfigFilepath)) {
