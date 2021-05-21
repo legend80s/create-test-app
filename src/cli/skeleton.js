@@ -148,19 +148,26 @@ async function insertCoverageConfig({ packageCwd }, options) {
 }
 
 async function updateConfig(jestConfigFilepath, config) {
-  let content = (await fsp.readFile(jestConfigFilepath)).toString();
+  const content = (await fsp.readFile(jestConfigFilepath)).toString();
+  let newContent = content;
 
   Object.keys(config).forEach(key => {
     const val = config[key];
 
     if (!content.includes(key)) {
-      content = content.replace('module.exports = {', `module.exports = {
+      newContent = newContent.replace('module.exports = {', `module.exports = {
   ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
     }
   });
 
-  console.log(LABEL, 'jest.config.js exists. Overwrite with:');
-  console.log(content);
+  if (content === newContent) {
+    console.log(LABEL, 'jest.config.js exists and has all the coverage config. Stop overwriting.');
 
-  await fsp.writeFile(jestConfigFilepath, content);
+    return;
+  }
+
+  console.log(LABEL, 'jest.config.js exists. Overwrite with:');
+  console.log(newContent);
+
+  await fsp.writeFile(jestConfigFilepath, newContent);
 }
