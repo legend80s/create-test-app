@@ -16,38 +16,50 @@ const tsDevDependencies = [
   '@types/jest',
 ];
 
+const jsDevDependencies = [
+  'jest',
+  '@types/jest',
+];
+
 const packageCwd = resolvePkgCwd();
 const jestConfigFilepath = join(packageCwd, 'jest.config.js');
+
+const TYPE_MAPPING = {
+  js: 'JavaScript',
+  ts: 'TypeScript',
+}
 
 /**
  *
  * @param {IOptions} options
  */
-exports.createTSTestSkeleton = async (options) => {
-  const { coverage } = options;
+function createTestSkeleton(options) {
+  const { coverage, type } = options;
 
-  console.log('[create-test-app] Project root:', chalk.green(packageCwd));
+  console.log(LABEL, 'Project root:', chalk.green(packageCwd));
 
-  const timeLabel = '[create-test-app] create test skeleton for TypeScript project costs'
+  const timeLabel = `${LABEL} create test skeleton for ${TYPE_MAPPING[type]} project costs`
   console.time(timeLabel)
 
   try {
     await install({ packageCwd, devDependencies: tsDevDependencies }, options);
 
-    if (!fileExists(jestConfigFilepath)) {
-      execCmd({ cmd: 'npx ts-jest config:init', packageCwd }, options);
-    } else {
-      console.log(`${LABEL}`, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
+    if (type === 'ts') {
+      if (!fileExists(jestConfigFilepath)) {
+        execCmd({ cmd: 'npx ts-jest config:init', packageCwd }, options);
+      } else {
+        console.log(LABEL, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
+      }
     }
 
     if (coverage) {
       await insertCoverageConfig({ packageCwd }, options);
     }
 
-    console.log('[create-test-app] Run test:')
+    console.log(LABEL, 'Run test:')
     console.log(chalk.green('  npm test'));
     console.log();
-    console.log(chalk.green('单测书写规范见 https://juejin.cn/post/6941761746952519711/'));
+    console.log(chalk.green(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/'));
   } catch (error) {
     console.error(chalk.red(error));
     console.error(error);
@@ -57,21 +69,31 @@ exports.createTSTestSkeleton = async (options) => {
 }
 
 /**
+ *
  * @param {IOptions} options
  */
-exports.createJSTestSkeleton = (options) => {
-
+exports.createTSTestSkeleton = async (options) => {
+  return createTestSkeleton(options)
 }
 
 /**
  * @param {IOptions} options
  */
+exports.createJSTestSkeleton = (options) => {
+  return createTestSkeleton(options)
+}
+
+/**
+ * @param {any} params
+ * @param {IOptions} options
+ */
 async function insertCoverageConfig({ packageCwd }, options) {
+  const { type } = options;
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
 
   const config = {
-    preset: 'ts-jest',
+    preset: type === 'ts' ? 'ts-jest' : undefined,
     testEnvironment: 'node',
 
     coverageDirectory: 'coverage',
