@@ -19,8 +19,7 @@ const options = new CLI()
     help: 'Project type. Default `JS`.',
   })
   .option('coverage', 'c', {
-    default: true,
-    help: 'Should collect coverage. Default true',
+    help: 'Should collect coverage. Default true. Will be taken as coverage rate if number provided',
   })
 
   .parse(process.argv.slice(2));

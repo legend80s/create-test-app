@@ -100,9 +100,11 @@ exports.createJSTestSkeleton = (options) => {
  * @param {IOptions} options
  */
 async function insertCoverageConfig({ packageCwd }, options) {
-  const { type } = options;
+  const { type, coverage } = options;
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
+
+  const rate = resolveCoverageRate(coverage);
 
   const config = {
     preset: type === 'ts' ? 'ts-jest' : '',
@@ -112,10 +114,10 @@ async function insertCoverageConfig({ packageCwd }, options) {
     coverageProvider: 'v8',
     coverageThreshold: `{
     global: {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100
+      branches: ${rate},
+      functions: ${rate},
+      lines: ${rate},
+      statements: ${rate}
     }
   }`,
   };
@@ -157,7 +159,18 @@ async function insertCoverageConfig({ packageCwd }, options) {
   }
 }
 
-async function updateConfig(jestConfigFilepath, config, options) {
+function resolveCoverageRate(coverage) {
+  return typeof coverage === 'number' ? coverage : 100;
+}
+
+/**
+ *
+ * @param {*} jestConfigFilepath
+ * @param {*} config
+ * @param {IOptions} options
+ * @returns
+ */
+async function updateConfig(jestConfigFilepath, config, { verbose, coverage }) {
   const content = (await fsp.readFile(jestConfigFilepath)).toString();
   let newContent = content;
 
@@ -166,13 +179,17 @@ async function updateConfig(jestConfigFilepath, config, options) {
   Object.keys(config).forEach(key => {
     const val = config[key];
 
+    // undefined 说明没有设置，则需要新增
     if (typeof configObj[key] === 'undefined') {
       newContent = newContent.replace('module.exports = {', `module.exports = {
   ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
+    } else if (key === 'coverageThreshold' && coverage !== false) {
+      // coverageThreshold 即使设置了，如果有自定义覆盖率则必须重新覆盖掉
+      newContent = newContent.replace(/: \d+/g, `: ${(resolveCoverageRate(coverage))}`);
     }
   });
 
-  if (content === newContent) {
+  if (newContent === content) {
     console.log(LABEL, 'jest.config.js exists and has all the coverage config. Stop overwriting.');
 
     return;
@@ -180,7 +197,9 @@ async function updateConfig(jestConfigFilepath, config, options) {
 
   console.log(LABEL, 'jest.config.js exists. Overwrite with:');
 
-  if (options.verbose || newContent.length <= 200) console.log(newContent);
+  // console.log(newContent.length, newContent);
+
+  if (verbose || newContent.length <= 500) console.log(newContent);
 
   await fsp.writeFile(jestConfigFilepath, newContent);
 }
