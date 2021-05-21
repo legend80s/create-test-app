@@ -135,7 +135,7 @@ async function insertCoverageConfig({ packageCwd }, options) {
 
     await fsp.writeFile(jestConfigFilepath, content);
   } else {
-    await updateConfig(jestConfigFilepath, config);
+    await updateConfig(jestConfigFilepath, config, options);
   }
 
   const pkg = JSON.parse((await fsp.readFile(pkgFilepath)).toString());
@@ -157,7 +157,7 @@ async function insertCoverageConfig({ packageCwd }, options) {
   }
 }
 
-async function updateConfig(jestConfigFilepath, config) {
+async function updateConfig(jestConfigFilepath, config, options) {
   const content = (await fsp.readFile(jestConfigFilepath)).toString();
   let newContent = content;
 
@@ -179,7 +179,8 @@ async function updateConfig(jestConfigFilepath, config) {
   }
 
   console.log(LABEL, 'jest.config.js exists. Overwrite with:');
-  console.log(newContent);
+
+  if (options.verbose || newContent.length <= 200) console.log(newContent);
 
   await fsp.writeFile(jestConfigFilepath, newContent);
 }
