@@ -144,19 +144,8 @@ async function insertCoverageConfig({ packageCwd }, options) {
 
   const pkg = JSON.parse((await fsp.readFile(pkgFilepath)).toString());
 
-  if(pkg.scripts.test) {
-    if (pkg.scripts.test.includes('jest --coverage')) {
-      // do nothing
-    } else {
-      pkg.scripts.test = 'jest --coverage && ' + pkg.scripts.test;
-    }
-  } else {
-    pkg.scripts.test = 'jest --coverage';
-  }
-
-  if(pkg.scripts.build) {
-    pkg.scripts.build = 'npm test && ' + pkg.scripts.build;
-  }
+  prependToScript(pkg, 'test', 'jest --coverage', { force: true });
+  prependToScript(pkg, 'build', 'npm test');
 
   await fsp.writeFile(pkgFilepath, JSON.stringify(pkg, null, 2));
 
@@ -216,4 +205,18 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
   if (verbose || newContent.length <= 500) !silent && console.log(newContent);
 
   await fsp.writeFile(jestConfigFilepath, newContent);
+}
+
+function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
+  if (pkg.scripts[scriptKey]) {
+    if (pkg.scripts[scriptKey].includes(scriptVal)) {
+      // do nothing
+    } else {
+      pkg.scripts[scriptKey] = `${scriptVal} && ${pkg.scripts[scriptKey]}`;
+    }
+  } else {
+    if (force) {
+      pkg.scripts[scriptKey] = scriptVal;
+    }
+  }
 }
