@@ -14,12 +14,17 @@ const options = new CLI()
   .option('dry-run', 'dr', {
     default: false,
   })
+  .option('silent', 's', {
+    default: false,
+    help: 'Only output the needed message.',
+  })
   .option('type', 't', {
     default: 'js',
     help: 'Project type. Default `JS`.',
   })
   .option('coverage', 'c', {
-    help: 'Should collect coverage. Default true. Will be taken as coverage rate if number provided',
+    default: 100,
+    help: 'Should collect coverage. Default 100',
   })
 
   .parse(process.argv.slice(2));

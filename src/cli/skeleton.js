@@ -41,9 +41,9 @@ function isTS(options) {
  * @param {IOptions} options
  */
 async function createTestSkeleton(options) {
-  const { coverage, type } = options;
+  const { coverage, type, silent } = options;
 
-  console.log(LABEL, 'Project root:', chalk.green(packageCwd));
+  !silent && console.log(LABEL, 'Project root:', chalk.green(packageCwd));
 
   const timeLabel = `${LABEL} create test skeleton for ${TYPE_MAPPING[type]} project costs`
   console.time(timeLabel)
@@ -58,12 +58,14 @@ async function createTestSkeleton(options) {
       if (!fileExists(jestConfigFilepath)) {
         execCmd({ cmd: 'npx ts-jest config:init', packageCwd }, options);
       } else {
-        console.log(LABEL, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
+        !silent && console.log(LABEL, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
       }
     }
 
     if (coverage) {
       await insertCoverageConfig({ packageCwd }, options);
+    } else {
+      !silent && console.log(LABEL, chalk.yellow('Coverage flag not set, wont enable coverage.'))
     }
   } catch (error) {
     console.error(chalk.red(error));
@@ -77,7 +79,7 @@ async function createTestSkeleton(options) {
   console.log(LABEL, 'Run test:')
   console.log(chalk.green('  npm test'));
   console.log();
-  console.log(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/');
+  !silent && console.log(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/');
 }
 
 /**
@@ -100,7 +102,7 @@ exports.createJSTestSkeleton = (options) => {
  * @param {IOptions} options
  */
 async function insertCoverageConfig({ packageCwd }, options) {
-  const { type, coverage } = options;
+  const { type, coverage, silent } = options;
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
 
@@ -132,8 +134,8 @@ async function insertCoverageConfig({ packageCwd }, options) {
   coverageThreshold: ${config.coverageThreshold},
 }
 `
-    console.log(LABEL, 'jest.config.js not exists. Written with:');
-    console.log(content);
+    !silent && console.log(LABEL, 'jest.config.js not exists. Written with:');
+    !silent && console.log(content);
 
     await fsp.writeFile(jestConfigFilepath, content);
   } else {
@@ -142,7 +144,19 @@ async function insertCoverageConfig({ packageCwd }, options) {
 
   const pkg = JSON.parse((await fsp.readFile(pkgFilepath)).toString());
 
-  pkg.scripts.test = 'jest --coverage';
+  if(pkg.scripts.test) {
+    if (pkg.scripts.test.includes('jest --coverage')) {
+      // do nothing
+    } else {
+      pkg.scripts.test = 'jest --coverage && ' + pkg.scripts.test;
+    }
+  } else {
+    pkg.scripts.test = 'jest --coverage';
+  }
+
+  if(pkg.scripts.build) {
+    pkg.scripts.build = 'npm test && ' + pkg.scripts.build;
+  }
 
   await fsp.writeFile(pkgFilepath, JSON.stringify(pkg, null, 2));
 
@@ -155,7 +169,7 @@ async function insertCoverageConfig({ packageCwd }, options) {
   if (!gitignore.includes('coverage')) {
     await fsp.appendFile(gitignoreFilepath, 'coverage/');
 
-    console.log(LABEL, 'Add coverage/ to', briefPath(gitignoreFilepath));
+    !silent && console.log(LABEL, 'Add coverage/ to', briefPath(gitignoreFilepath));
   }
 }
 
@@ -170,7 +184,7 @@ function resolveCoverageRate(coverage) {
  * @param {IOptions} options
  * @returns
  */
-async function updateConfig(jestConfigFilepath, config, { verbose, coverage }) {
+async function updateConfig(jestConfigFilepath, config, { verbose, coverage, silent }) {
   const content = (await fsp.readFile(jestConfigFilepath)).toString();
   let newContent = content;
 
@@ -190,16 +204,16 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage }) {
   });
 
   if (newContent === content) {
-    console.log(LABEL, 'jest.config.js exists and has all the coverage config. Stop overwriting.');
+    !silent && console.log(LABEL, 'jest.config.js exists and has all the coverage config. Stop overwriting.');
 
     return;
   }
 
-  console.log(LABEL, 'jest.config.js exists. Overwrite with:');
+  !silent && console.log(LABEL, 'jest.config.js exists. Overwrite with:');
 
   // console.log(newContent.length, newContent);
 
-  if (verbose || newContent.length <= 500) console.log(newContent);
+  if (verbose || newContent.length <= 500) !silent && console.log(newContent);
 
   await fsp.writeFile(jestConfigFilepath, newContent);
 }
