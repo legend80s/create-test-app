@@ -1,12 +1,11 @@
 <h1 align="center">Welcome to create-test-app 👋</h1>
 
 > Armed your project with Jest.
->
-> A scaffolding CLI to make your project tested by Jest and with coverage enabled.
+> A opinionated scaffolding CLI to make your project tested by Jest and with coverage enabled.
 
 ## Why
 
-Because configure Jest and coverage is trivial 🤕😰.
+Because configure Jest and coverage is trivial 🤕.
 
 ## Use
 
@@ -90,7 +89,7 @@ package.json
 #### 4. Write tests
 
 ```sh
-md test && touch lite-lodash.test.ts
+md test && cd test && touch lite-lodash.test.ts
 ```
 
 lite-lodash.test.js
