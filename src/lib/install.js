@@ -3,6 +3,8 @@ const { join } = require('path');
 const { execSync } = require('child_process');
 const chalk = require('chalk');
 
+const { intersection } = require('./lite-lodash');
+
 const { hasYarn } = require('./has-yarn.js');
 const { briefPath } = require('./path.js');
 const { LABEL } = require('../constants.js');
@@ -11,26 +13,38 @@ const { resolveInstallerName } = require('./resolve-installer.js');
 /**
  *
  * @param {{ packageCwd: string; dependencies: string[]; devDependencies: string[]; }}
- * @param {{ forceInstall: boolean; }} options
+ * @param {IOptions} options
  * @returns
  */
 exports.install = async function install({ packageCwd, dependencies = [], devDependencies = [] }, options) {
-  const { forceInstall, dryRun } = options;
+  const { forceInstall, dryRun, silent, verbose } = options;
 
   // console.log('forceInstall:', forceInstall);
 
   const uninstalled = getUninstalled(packageCwd, dependencies.concat(devDependencies), options);
+  verbose && console.log('uninstalled:', uninstalled);
+  // console.log('uninstalled:', uninstalled);
 
   if (!forceInstall && uninstalled.length === 0) {
-    console.log(LABEL, chalk.green(`All the dependencies has been installed already. Stop installing`));
+    !silent && console.log(LABEL, chalk.green(`All the dependencies has been installed already. Stop installing`));
 
     return;
   }
 
   const pmName = resolveInstallerName();
 
-  const devCmd = genInstallCmd({ pmName, dependencies: devDependencies, scope: 'dev', packageCwd});
-  const prodCmd = genInstallCmd({ pmName, dependencies, scope: 'prod', packageCwd });
+  const devCmd = genInstallCmd({
+    pmName,
+    dependencies: intersection(devDependencies, uninstalled),
+    scope: 'dev',
+    packageCwd
+  });
+  const prodCmd = genInstallCmd({
+    pmName,
+    dependencies: intersection(dependencies, uninstalled),
+    scope: 'prod',
+    packageCwd,
+  });
   const cmd = [devCmd, prodCmd].filter(Boolean).join(' && ');
 
   if (!cmd) {
@@ -39,18 +53,18 @@ exports.install = async function install({ packageCwd, dependencies = [], devDep
     return;
   }
 
-  console.log(`${LABEL} Installing to`, chalk.green(briefPath(packageCwd)), '🚀 ');
+  !silent && console.log(`${LABEL} Installing to`, chalk.green(briefPath(packageCwd)), '🚀 ');
   console.time(`${LABEL} Install packages costs`);
-  console.log(chalk.green('  ', cmd));
-  console.log();
+  !silent && console.log(chalk.green('  ', cmd));
+  !silent && console.log();
 
   try {
     !dryRun && execSync(cmd, { stdio: 'inherit', cwd: packageCwd });
-    console.log(`${LABEL} Install success ✅`);
+    !silent && console.log(`${LABEL} Install success ✅`);
 
     return true;
   } catch (error) {
-    console.log(`${LABEL} Install failed ❌`);
+    console.error(`${LABEL} Install failed ❌`);
     console.error(chalk.red(cmd, 'failed:'));
     console.error(error);
 
@@ -73,7 +87,7 @@ function getUninstalled(packageCwd, dependencies, options) {
   try {
     const content = readFileSync(join(packageCwd, 'package.json')).toString();
 
-    return dependencies.filter(dep => !content.includes(dep));
+    return dependencies.filter(dep => !content.includes(`"${dep}"`));
   } catch (error) {
     options.verbose && console.log('error:', error);
 
@@ -87,6 +101,7 @@ function getUninstalled(packageCwd, dependencies, options) {
  * @returns {string}
  */
 function genInstallCmd({ pmName, dependencies, scope, packageCwd }) {
+  // console.log('dependencies:', dependencies);
   if (isEmpty(dependencies)) {
     return '';
   }
