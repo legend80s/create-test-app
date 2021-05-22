@@ -9,8 +9,10 @@
   "scripts": {
     "preversion": "npm test",
     "postversion": "npm publish && git push && git push --tags",
-    "test": "npm run test:js && npm run test:ts",
+    "jest": "jest --coverage ./test/lib",
+    "test": "npm run jest && npm run test:js && npm run test:ts",
     "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 && npm test && cd -",
+    "test:ts:silent": "cd test/e2e-ts && node ../../ --type ts --silent && npm test && cd -",
     "test:ts": "cd test/e2e-ts && node ../../ --type ts && npm test && cd -"
   },
   "bin": {
@@ -32,7 +34,9 @@
   },
   "homepage": "https://github.com/legend80s/create-test-app#readme",
   "devDependencies": {
-    "git-commit-msg-linter": "^3.1.0"
+    "@types/jest": "^26.0.23",
+    "git-commit-msg-linter": "^3.1.0",
+    "jest": "^26.6.3"
   },
   "dependencies": {
     "chalk": "^4.1.1",
