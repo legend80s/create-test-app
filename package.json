@@ -16,7 +16,7 @@
     "preversion": "npm test",
     "postversion": "npm publish && git push && git push --tags",
     "jest": "jest --coverage ./test/utils",
-    "test": "jest --coverage && npm run jest && npm run test:js && npm run test:ts",
+    "test": "npm run jest && npm run test:js && npm run test:ts",
     "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 && npm test && cd -",
     "test:ts:silent": "cd test/e2e-ts && node ../../ --type ts --silent && npm test && cd -",
     "test:ts": "cd test/e2e-ts && node ../../ --type ts && npm test && cd -"
