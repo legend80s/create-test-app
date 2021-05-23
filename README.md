@@ -5,7 +5,7 @@
 
 ## Why
 
-Because configure Jest and coverage is trivial 🤕.
+Because configure Jest and coverage is tedious 🤕.
 
 ## Use
 
