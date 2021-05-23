@@ -38,13 +38,15 @@ exports.install = async function install({ packageCwd, dependencies = [], devDep
     dependencies: intersection(devDependencies, uninstalled),
     scope: 'dev',
     packageCwd
-  });
+  }, options);
+
   const prodCmd = genInstallCmd({
     pmName,
     dependencies: intersection(dependencies, uninstalled),
     scope: 'prod',
     packageCwd,
-  });
+  }, options);
+
   const cmd = [devCmd, prodCmd].filter(Boolean).join(' && ');
 
   if (!cmd) {
@@ -100,7 +102,7 @@ function getUninstalled(packageCwd, dependencies, options) {
  * @param 'dev' | 'prod' options.scope
  * @returns {string}
  */
-function genInstallCmd({ pmName, dependencies, scope, packageCwd }) {
+function genInstallCmd({ pmName, dependencies, scope, packageCwd }, options) {
   // console.log('dependencies:', dependencies);
   if (isEmpty(dependencies)) {
     return '';
@@ -118,7 +120,7 @@ function genInstallCmd({ pmName, dependencies, scope, packageCwd }) {
 
   let installOptions = [pmName === 'yarn' ? 'yarn add' : `${pmName} install`, ...dependencies, npmMapping[scope]];
 
-  if (hasYarn(packageCwd)) {
+  if (hasYarn(packageCwd, options)) {
     installOptions = [pmName === 'yarn' ? 'yarn add' : `${pmName} install`, ...dependencies, yarnMapping[scope]];
   }
 

@@ -208,6 +208,10 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
 }
 
 function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
+  if (!pkg.scripts) {
+    pkg.scripts = {};
+  }
+
   if (pkg.scripts[scriptKey]) {
     if (pkg.scripts[scriptKey].includes(scriptVal)) {
       // do nothing
@@ -221,7 +225,7 @@ function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
   }
 }
 
-const ut = `/** YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
+const ut = `/** TODO: YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
 describe('lite-lodash', () => {
   describe('isPromise', () => {
     it('Should Promise.resolve be a promise', () => {
