@@ -17,6 +17,7 @@
     "postversion": "npm publish && git push && git push --tags",
     "jest": "jest --coverage ./test/utils",
     "test": "npm run jest && npm run test:js && npm run test:ts",
+    "test:empty": "rm -rf empty-project && mkdir empty-project && cd empty-project && node ../ && cd -",
     "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 && npm test && cd -",
     "test:ts:silent": "cd test/e2e-ts && node ../../ --type ts --silent && npm test && cd -",
     "test:ts": "cd test/e2e-ts && node ../../ --type ts && npm test && cd -"
