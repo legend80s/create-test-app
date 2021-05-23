@@ -9,13 +9,13 @@ Because configure Jest and coverage is trivial 🤕.
 
 ## Use
 
-For TypeScript project.
+For TypeScript project:
 
 ```sh
 npx create-test-app --type ts
 ```
 
-For JavaScript project.
+For JavaScript project:
 
 ```sh
 npx create-test-app
