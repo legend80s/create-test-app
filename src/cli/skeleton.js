@@ -1,12 +1,12 @@
 const chalk = require('chalk')
 const fs = require('fs')
-const { join } = require('path');
+const { join, resolve } = require('path');
 const { LABEL } = require('../constants');
-const { execCmd } = require('../lib/exec-cmd');
-const { fileExists } = require('../lib/file-exists');
-const { install } = require('../lib/install');
-const { briefPath } = require('../lib/path');
-const { resolvePkgCwd } = require('../lib/resolve-pkg-cwd');
+const { execCmd } = require('../utils/exec-cmd');
+const { fileExists } = require('../utils/file-exists');
+const { install } = require('../utils/install');
+const { briefPath } = require('../utils/path');
+const { resolvePkgCwd } = require('../utils/resolve-pkg-cwd');
 
 const fsp = fs.promises;
 
@@ -67,6 +67,8 @@ async function createTestSkeleton(options) {
     } else {
       !silent && console.log(LABEL, chalk.yellow('Coverage flag not set, wont enable coverage.'))
     }
+
+    await newTest();
   } catch (error) {
     console.error(chalk.red(error));
     console.error(error);
@@ -78,8 +80,6 @@ async function createTestSkeleton(options) {
 
   console.log(LABEL, 'Run test:')
   console.log(chalk.green('  npm test'));
-  console.log();
-  !silent && console.log(LABEL, 'How to write Jest UT: https://juejin.cn/post/6941761746952519711/');
 }
 
 /**
@@ -219,4 +219,37 @@ function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
       pkg.scripts[scriptKey] = scriptVal;
     }
   }
+}
+
+const ut = `/** YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
+describe('lite-lodash', () => {
+  describe('isPromise', () => {
+    it('Should Promise.resolve be a promise', () => {
+      const input = Promise.resolve();
+      const actual = isPromise(input);
+      const expected = true;
+
+      expect(actual).toEqual(expected);
+    });
+
+    it('Should number not a promise', () => {
+      const input = 100;
+      const actual = isPromise(input);
+      const expected = false;
+
+      expect(actual).toEqual(expected);
+    });
+  });
+});
+`
+
+async function newTest() {
+  const testPath = resolve('./test');
+
+  if (fileExists(testPath)) {
+    return;
+  }
+
+  await fsp.mkdir(testPath);
+  await fsp.writeFile(join(testPath, 'index.test.js'), ut);
 }
