@@ -5,6 +5,7 @@ const { LABEL } = require('../constants');
 const { execCmd } = require('../utils/exec-cmd');
 const { fileExists } = require('../utils/file-exists');
 const { install } = require('../utils/install');
+const { hasWord } = require('../utils/lite-lodash');
 const { briefPath } = require('../utils/path');
 const { resolvePkgCwd } = require('../utils/resolve-pkg-cwd');
 
@@ -78,7 +79,7 @@ async function createTestSkeleton(options) {
     console.timeEnd(timeLabel)
   }
 
-  console.log(LABEL, 'Run test:')
+  console.log(LABEL, 'You can now run test by executing:')
   console.log(chalk.green('  npm test'));
 }
 
@@ -155,7 +156,7 @@ async function insertCoverageConfig({ packageCwd }, options) {
     gitignore = (await fsp.readFile(gitignoreFilepath)).toString();
   }
 
-  if (!gitignore.includes('coverage')) {
+  if (!hasWord(gitignore, 'coverage')) {
     await fsp.appendFile(gitignoreFilepath, 'coverage/');
 
     !silent && console.log(LABEL, 'Add coverage/ to', briefPath(gitignoreFilepath));
