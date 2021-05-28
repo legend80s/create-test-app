@@ -1,6 +1,16 @@
-const { paths2ModuleNameMapper } = require('../../src/utils/path');
+const { briefPath, paths2ModuleNameMapper } = require('../../src/utils/path');
 
 describe('path', () => {
+  describe('briefPath', () => {
+    it('should work', () => {
+      const input = '/Users/xx/workspace/legend80s/create-test-app';
+      const actual = briefPath(input);
+      const expected = '~/workspace/legend80s/create-test-app';
+
+      expect(actual).toEqual(expected);
+    });
+  });
+
   describe('paths2ModuleNameMapper', () => {
     it('should transform 1 path array which prefixed with ./', () => {
       const input = { "@/*": ["./src/*"] };
