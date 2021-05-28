@@ -16,12 +16,17 @@ exports.intersection = (arr1 = [], arr2 = []) => {
 exports.hasWord = (sentence, word) => {
   return new RegExp(`\\b${word}\\b`).test(sentence);
 }
+
 /**
  * @param {Record<string, any>} json
  * @param {Record<string, string | number | (value: string | number | any[], key: string, json: Record<string, any>) => string | number>} patch
  */
-exports.patchJSON = (json, patch) => {
-  const hydrated = Object.keys(patch).reduce((acc, key) => {
+exports.merge = (json, patch) => {
+  if (!patch) {
+    return { ...json };
+  }
+
+  return Object.keys(patch).reduce((acc, key) => {
     const value = patch[key];
 
     const computed = typeof value !== 'function' ?
@@ -32,10 +37,5 @@ exports.patchJSON = (json, patch) => {
       ...acc,
       [key]: computed,
     }
-  }, {});
-
-  return {
-    ...json,
-    ...hydrated,
-  }
+  }, json);
 }

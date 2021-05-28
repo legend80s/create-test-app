@@ -1,6 +1,5 @@
 const chalk = require('chalk')
 const fs = require('fs');
-const { readJson } = require('fs-extra');
 const { join, resolve } = require('path');
 const { LABEL } = require('../constants');
 const { execCmd } = require('../utils/exec-cmd');

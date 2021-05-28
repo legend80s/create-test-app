@@ -1,5 +1,5 @@
 const fsp = require('fs-extra');
-const { patchJSON: pj } = require('./lite-lodash');
+const { merge } = require('./lite-lodash');
 
 /**
  * @param {string} jsonFilepath
@@ -8,7 +8,7 @@ const { patchJSON: pj } = require('./lite-lodash');
 exports.patchJSON = async (jsonFilepath, patch) => {
   const json = await fsp.readJson(jsonFilepath);
 
-  const updated = pj(json, patch);
+  const updated = merge(json, patch);
 
   await fsp.writeJson(jsonFilepath, updated, { spaces: 2 });
 
