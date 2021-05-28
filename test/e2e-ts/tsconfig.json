@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "allowJs": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "noImplicitThis": true,
+    "lib": ["ES2015", "DOM"],
+    "types": ["@alipay/minifish-global-types"],
+    "paths": {
+      "/common/*": ["./src/common/*"],
+      "/services/*": ["./src/services/*"]
+    }
+  },
+  "include": ["src", "global.d.ts"]
+}
