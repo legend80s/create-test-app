@@ -21,6 +21,20 @@ For JavaScript project:
 npx create-test-app
 ```
 
+## Advanced
+
+set coverage to 50 and and enable import alias in test file.
+
+```sh
+npx create-test-app --type ts --coverage 50 --alias-prefix='@/'
+```
+
+```diff
++  'moduleNameMapper': {
++    '^@/(.*)': '<rootDir>/src/$1',
++  },
+```
+
 ## How it works
 
 Automatically armed your project with jest. You can do it manually if you don't trust this CLI.
