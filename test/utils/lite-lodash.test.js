@@ -1,4 +1,4 @@
-const { intersection, hasWord } = require('../../src/utils/lite-lodash');
+const { intersection, hasWord, patchJSON } = require('../../src/utils/lite-lodash');
 
 describe('lite-lodash', () => {
   describe('intersection', () => {
@@ -52,6 +52,61 @@ describe('lite-lodash', () => {
     it('"idecoverage" not has word "coverage"', () => {
       const actual = hasWord('idecoverage', 'coverage');
       const expected = false;
+
+      expect(actual).toEqual(expected);
+    });
+  });
+
+  describe('patchJSON', () => {
+    it('Should add static version', () => {
+      const input = { name: 'foo' };
+      const actual = patchJSON(input, { version: '1.0.0' });
+      const expected = { name: 'foo', version: '1.0.0' };
+
+      expect(actual).toEqual(expected);
+    });
+
+    it('Should overwrite name', () => {
+      const input = { name: 'foo' };
+      const actual = patchJSON(input, { name: 'bar' });
+      const expected = { name: 'bar' };
+
+      expect(actual).toEqual(expected);
+    });
+
+    it('Should add version be evaluated by function', () => {
+      const input = { name: 'foo' };
+      const actual = patchJSON(input, {
+        version: (value, key, json) => {
+          expect(value).toEqual(undefined);
+          expect(key).toEqual('version');
+          expect(json).toEqual(input);
+
+          return '2.0.0';
+        }
+      });
+
+      const expected = { name: 'foo', version: '2.0.0' };
+
+      expect(actual).toEqual(expected);
+    });
+
+    it('Should transform to array', () => {
+      const input = { name: 'foo', types: 'bar', list: ['baz'] };
+      const actual = patchJSON(input, {
+        types: (value, key, json) => {
+          return [value, 'bar2'];
+        },
+        list: (value, key, json) => {
+          return [...value, 'baz2']
+        }
+      });
+
+      const expected = {
+        name: 'foo',
+        types: ['bar', 'bar2'],
+        list: ['baz', 'baz2'],
+      };
 
       expect(actual).toEqual(expected);
     });

@@ -5,12 +5,25 @@
     "noEmit": true,
     "esModuleInterop": true,
     "noImplicitThis": true,
-    "lib": ["ES2015", "DOM"],
-    "types": ["@alipay/minifish-global-types"],
+    "lib": [
+      "ES2015",
+      "DOM"
+    ],
+    "types": [
+      "@alipay/minifish-global-types",
+      "jest"
+    ],
     "paths": {
-      "/common/*": ["./src/common/*"],
-      "/services/*": ["./src/services/*"]
+      "/common/*": [
+        "./src/common/*"
+      ],
+      "/services/*": [
+        "./src/services/*"
+      ]
     }
   },
-  "include": ["src", "global.d.ts"]
+  "include": [
+    "src",
+    "global.d.ts"
+  ]
 }
