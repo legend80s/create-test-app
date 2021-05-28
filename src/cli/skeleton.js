@@ -139,13 +139,15 @@ async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
   }`,
   };
 
-  const { compilerOptions: { paths } } = tsconfig || {};
+  if (tsconfig) {
+    const { compilerOptions: { paths } } = tsconfig;
 
-  if (paths) {
-    config.moduleNameMapper = JSON.stringify(
-      paths2ModuleNameMapper(paths), null, 2
-    )
-      .replace(/^/gm, '  ');
+    if (paths) {
+      config.moduleNameMapper = JSON.stringify(
+        paths2ModuleNameMapper(paths), null, 2
+      )
+        .replace(/^/gm, '  ');
+    }
   }
 
   if (!fileExists(jestConfigFilepath)) {
