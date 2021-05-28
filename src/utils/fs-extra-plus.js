@@ -10,5 +10,7 @@ exports.patchJSON = async (jsonFilepath, patch) => {
 
   const updated = pj(json, patch);
 
-  return fsp.writeJson(jsonFilepath, updated, { spaces: 2 });
+  await fsp.writeJson(jsonFilepath, updated, { spaces: 2 });
+
+  return updated;
 };

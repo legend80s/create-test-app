@@ -1,5 +1,6 @@
 const chalk = require('chalk')
-const fs = require('fs')
+const fs = require('fs');
+const { readJson } = require('fs-extra');
 const { join, resolve } = require('path');
 const { LABEL } = require('../constants');
 const { execCmd } = require('../utils/exec-cmd');
@@ -7,7 +8,7 @@ const { fileExists } = require('../utils/file-exists');
 const { patchJSON } = require('../utils/fs-extra-plus');
 const { install } = require('../utils/install');
 const { hasWord } = require('../utils/lite-lodash');
-const { briefPath } = require('../utils/path');
+const { briefPath, paths2ModuleNameMapper } = require('../utils/path');
 const { resolvePkgCwd } = require('../utils/resolve-pkg-cwd');
 
 const fsp = fs.promises;
@@ -25,7 +26,9 @@ const jsDevDependencies = [
 
 const packageCwd = resolvePkgCwd();
 const jestConfigFilepath = join(packageCwd, 'jest.config.js');
-const tsconfigFilepath = join(packageCwd, 'tsconfig.json');
+
+const tsconfigFilepathRaw = join(packageCwd, 'tsconfig.json');
+const jsconfigFilepathRaw = join(packageCwd, 'jsconfig.json');
 
 const TYPE_MAPPING = {
   js: 'JavaScript',
@@ -44,7 +47,12 @@ function isTS(options) {
  * @param {IOptions} options
  */
 async function createTestSkeleton(options) {
+  let tsconfig;
   const { coverage, type, silent } = options;
+  const tsconfigFilepath = fileExists(tsconfigFilepathRaw) ?
+    tsconfigFilepathRaw :
+    jsconfigFilepathRaw
+  ;
 
   !silent && console.log(LABEL, 'Project root:', chalk.green(packageCwd));
 
@@ -65,12 +73,12 @@ async function createTestSkeleton(options) {
       }
 
       if (fileExists(tsconfigFilepath)) {
-        updateTSConfig();
+        tsconfig = await updateTSConfig();
       }
     }
 
     if (coverage) {
-      await insertCoverageConfig({ packageCwd }, options);
+      await insertCoverageConfig({ packageCwd, tsconfig }, options);
     } else {
       !silent && console.log(LABEL, chalk.yellow('Coverage flag not set, wont enable coverage.'))
     }
@@ -108,7 +116,7 @@ exports.createJSTestSkeleton = (options) => {
  * @param {any} params
  * @param {IOptions} options
  */
-async function insertCoverageConfig({ packageCwd }, options) {
+async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
   const { type, coverage, silent } = options;
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
@@ -131,6 +139,15 @@ async function insertCoverageConfig({ packageCwd }, options) {
   }`,
   };
 
+  const { compilerOptions: { paths } } = tsconfig || {};
+
+  if (paths) {
+    config.moduleNameMapper = JSON.stringify(
+      paths2ModuleNameMapper(paths), null, 2
+    )
+      .replace(/^/gm, '  ');
+  }
+
   if (!fileExists(jestConfigFilepath)) {
     const content = `module.exports = {
   preset: '${config.preset}',
@@ -139,6 +156,8 @@ async function insertCoverageConfig({ packageCwd }, options) {
   coverageDirectory: '${config.coverageDirectory}',
   coverageProvider: '${config.coverageProvider}',
   coverageThreshold: ${config.coverageThreshold},
+
+  moduleNameMapper: ${config.moduleNameMapper},
 }
 `
     !silent && console.log(LABEL, 'jest.config.js not exists. Written with:');
@@ -174,7 +193,6 @@ function resolveCoverageRate(coverage) {
 }
 
 /**
- *
  * @param {*} jestConfigFilepath
  * @param {*} config
  * @param {IOptions} options
@@ -188,6 +206,7 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
 
   Object.keys(config).forEach(key => {
     const val = config[key];
+    // console.log('key:', key, 'configObj[key]', configObj[key]);
 
     // undefined 说明没有设置，则需要新增
     if (typeof configObj[key] === 'undefined') {
