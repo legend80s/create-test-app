@@ -4,6 +4,7 @@ const { join, resolve } = require('path');
 const { LABEL } = require('../constants');
 const { execCmd } = require('../utils/exec-cmd');
 const { fileExists } = require('../utils/file-exists');
+const { patchJSON } = require('../utils/fs-extra-plus');
 const { install } = require('../utils/install');
 const { hasWord } = require('../utils/lite-lodash');
 const { briefPath } = require('../utils/path');
@@ -24,6 +25,7 @@ const jsDevDependencies = [
 
 const packageCwd = resolvePkgCwd();
 const jestConfigFilepath = join(packageCwd, 'jest.config.js');
+const tsconfigFilepath = join(packageCwd, 'tsconfig.json');
 
 const TYPE_MAPPING = {
   js: 'JavaScript',
@@ -60,6 +62,10 @@ async function createTestSkeleton(options) {
         execCmd({ cmd: 'npx ts-jest config:init', packageCwd }, options);
       } else {
         !silent && console.log(LABEL, 'jest.config.js already exists. Won\'t execute $ npx ts-jest config:init')
+      }
+
+      if (fileExists(tsconfigFilepath)) {
+        updateTSConfig();
       }
     }
 
@@ -257,4 +263,25 @@ async function newTest() {
 
   await fsp.mkdir(testPath);
   await fsp.writeFile(join(testPath, 'index.test.js'), ut);
+}
+
+async function updateTSConfig() {
+  // types: ["a"] => types: ["a", "jest"]
+  return patchJSON(tsconfigFilepath, {
+    compilerOptions: (compilerOptions, key, json) => {
+      const types = compilerOptions.types;
+
+      if (typeof types === 'undefined') {
+        return {
+          ...compilerOptions,
+          types: ['jest']
+        };
+      }
+
+      return {
+        ...compilerOptions,
+        types: types.includes('jest') ? types : types.concat('jest')
+      };
+    }
+  });
 }

@@ -26,6 +26,10 @@ const options = new CLI()
     default: 100,
     help: 'Should collect coverage. Default 100',
   })
+  .option('alias', {
+    default: '',
+    help: 'Add module name prefix to enable `moduleNameMapper`.',
+  })
 
   .parse(process.argv.slice(2));
 

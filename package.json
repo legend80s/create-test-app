@@ -16,6 +16,7 @@
     "preversion": "npm test",
     "postversion": "npm publish && git push && git push --tags",
     "jest": "jest --coverage ./test/utils",
+    "jest:no-cov": "jest ./test/utils",
     "test": "npm run jest && npm run test:js && npm run test:ts && npm run test:empty",
     "test:empty": "rm -rf empty-project && mkdir empty-project && cd empty-project && node ../ && cd -",
     "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 && npm test && cd -",
@@ -49,6 +50,7 @@
     "chalk": "^4.1.1",
     "cli-aid": "^6.4.0",
     "command-exists": "^1.2.9",
+    "fs-extra": "^10.0.0",
     "has-yarn": "^2.1.0"
   }
 }
