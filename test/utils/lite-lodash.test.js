@@ -1,4 +1,4 @@
-const { intersection, hasWord, patchJSON } = require('../../src/utils/lite-lodash');
+const { intersection, hasWord, merge } = require('../../src/utils/lite-lodash');
 
 describe('lite-lodash', () => {
   describe('intersection', () => {
@@ -57,10 +57,10 @@ describe('lite-lodash', () => {
     });
   });
 
-  describe('patchJSON', () => {
+  describe('merge', () => {
     it('Should add static version', () => {
       const input = { name: 'foo' };
-      const actual = patchJSON(input, { version: '1.0.0' });
+      const actual = merge(input, { version: '1.0.0' });
       const expected = { name: 'foo', version: '1.0.0' };
 
       expect(actual).toEqual(expected);
@@ -68,7 +68,7 @@ describe('lite-lodash', () => {
 
     it('Should overwrite name', () => {
       const input = { name: 'foo' };
-      const actual = patchJSON(input, { name: 'bar' });
+      const actual = merge(input, { name: 'bar' });
       const expected = { name: 'bar' };
 
       expect(actual).toEqual(expected);
@@ -76,7 +76,7 @@ describe('lite-lodash', () => {
 
     it('Should add version be evaluated by function', () => {
       const input = { name: 'foo' };
-      const actual = patchJSON(input, {
+      const actual = merge(input, {
         version: (value, key, json) => {
           expect(value).toEqual(undefined);
           expect(key).toEqual('version');
@@ -93,7 +93,7 @@ describe('lite-lodash', () => {
 
     it('Should transform to array', () => {
       const input = { name: 'foo', types: 'bar', list: ['baz'] };
-      const actual = patchJSON(input, {
+      const actual = merge(input, {
         types: (value, key, json) => {
           return [value, 'bar2'];
         },
