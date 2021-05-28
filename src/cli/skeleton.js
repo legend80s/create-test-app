@@ -73,7 +73,7 @@ async function createTestSkeleton(options) {
       }
 
       if (fileExists(tsconfigFilepath)) {
-        tsconfig = await updateTSConfig();
+        tsconfig = await updateTSConfig(tsconfigFilepath);
       }
     }
 
@@ -88,7 +88,7 @@ async function createTestSkeleton(options) {
     console.error(chalk.red(error));
     console.error(error);
 
-    return;
+    throw error;
   } finally {
     console.timeEnd(timeLabel)
   }
@@ -286,7 +286,7 @@ async function newTest() {
   await fsp.writeFile(join(testPath, 'index.test.js'), ut);
 }
 
-async function updateTSConfig() {
+async function updateTSConfig(tsconfigFilepath) {
   // types: ["a"] => types: ["a", "jest"]
   return patchJSON(tsconfigFilepath, {
     compilerOptions: (compilerOptions, key, json) => {
