@@ -1,4 +1,12 @@
 module.exports = {
+  moduleNameMapper:   {
+    "^/common/(.*)": [
+      "<rootDir>/src/common/$1"
+    ],
+    "^/services/(.*)": [
+      "<rootDir>/src/services/$1"
+    ]
+  },
   coverageThreshold: {
     global: {
       branches: 100,
