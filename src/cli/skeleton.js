@@ -170,7 +170,8 @@ async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
   coverageThreshold: ${config.coverageThreshold},
   transform: ${config.transform},
 ` +
-  config.moduleNameMapper ? `\nmoduleNameMapper: ${config.moduleNameMapper},` : ''
+  (config.moduleNameMapper ? `\nmoduleNameMapper: ${config.moduleNameMapper},` : '')
+  +
 `}
 `   ;
     !silent && console.log(LABEL, 'jest.config.js not exists. Written with:');
@@ -225,7 +226,7 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
     if (typeof configObj[key] === 'undefined') {
       // console.log('key:', key, 'value:', value, `${value}`);
       newContent = newContent.replace('module.exports = {', `module.exports = {
-  ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
+  ${key}: ${value.includes('{') ? value: "'" + value + "'"},`);
     } else if (key === 'coverageThreshold' && coverage !== false) {
       // coverageThreshold 即使设置了，如果有自定义覆盖率则必须重新覆盖掉
       newContent = newContent.replace(/: \d+/g, `: ${(resolveCoverageRate(coverage))}`);
