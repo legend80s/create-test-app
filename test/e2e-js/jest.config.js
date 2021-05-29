@@ -1,4 +1,8 @@
 module.exports = {
+  transform: {
+    "^.+\\.(js)$": "babel-jest",
+    "^.+\\.(sjs)$": "babel-jest",
+  },
   preset: '',
   testEnvironment: 'node',
 
