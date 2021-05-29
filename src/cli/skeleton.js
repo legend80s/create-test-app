@@ -1,6 +1,8 @@
 const chalk = require('chalk')
 const fs = require('fs');
 const { join, resolve } = require('path');
+const json5 = require('json5');
+
 const { LABEL } = require('../constants');
 const { execCmd } = require('../utils/exec-cmd');
 const { fileExists } = require('../utils/file-exists');
@@ -9,6 +11,7 @@ const { install } = require('../utils/install');
 const { hasWord } = require('../utils/lite-lodash');
 const { briefPath, paths2ModuleNameMapper } = require('../utils/path');
 const { resolvePkgCwd } = require('../utils/resolve-pkg-cwd');
+const { stringifyTransformers } = require('../utils/jest-utils');
 
 const fsp = fs.promises;
 
@@ -21,10 +24,13 @@ const tsDevDependencies = [
 const jsDevDependencies = [
   'jest',
   '@types/jest',
+  'babel-jest',
+  '@babel/preset-env',
 ];
 
 const packageCwd = resolvePkgCwd();
 const jestConfigFilepath = join(packageCwd, 'jest.config.js');
+const babelConfigFilepath = join(__dirname, '../assets/babel.config.js');
 
 const tsconfigFilepathRaw = join(packageCwd, 'tsconfig.json');
 const jsconfigFilepathRaw = join(packageCwd, 'jsconfig.json');
@@ -82,6 +88,8 @@ async function createTestSkeleton(options) {
       !silent && console.log(LABEL, chalk.yellow('Coverage flag not set, wont enable coverage.'))
     }
 
+    await newBabelConfig(packageCwd);
+
     await newTest();
   } catch (error) {
     console.error(chalk.red(error));
@@ -116,7 +124,7 @@ exports.createJSTestSkeleton = (options) => {
  * @param {IOptions} options
  */
 async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
-  const { type, coverage, silent } = options;
+  const { type, coverage, silent, transform } = options;
   const pkgFilepath = join(packageCwd, 'package.json');
   const gitignoreFilepath = join(packageCwd, '.gitignore');
 
@@ -134,9 +142,12 @@ async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
       functions: ${rate},
       lines: ${rate},
       statements: ${rate}
-    }
+    },
   }`,
+  transform: stringifyTransformers({ js: 'babel-jest', ...json5.parse(transform) }),
   };
+
+  // console.log('config:', config);
 
   if (tsconfig) {
     const { compilerOptions: { paths } } = tsconfig;
@@ -157,10 +168,11 @@ async function insertCoverageConfig({ packageCwd, tsconfig }, options) {
   coverageDirectory: '${config.coverageDirectory}',
   coverageProvider: '${config.coverageProvider}',
   coverageThreshold: ${config.coverageThreshold},
-
-  moduleNameMapper: ${config.moduleNameMapper},
-}
-`
+  transform: ${config.transform},
+` +
+  config.moduleNameMapper ? `\nmoduleNameMapper: ${config.moduleNameMapper},` : ''
+`}
+`   ;
     !silent && console.log(LABEL, 'jest.config.js not exists. Written with:');
     !silent && console.log(content);
 
@@ -206,11 +218,12 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
   const configObj = require(jestConfigFilepath);
 
   Object.keys(config).forEach(key => {
-    const val = config[key];
+    const value = config[key];
     // console.log('key:', key, 'configObj[key]', configObj[key]);
 
     // undefined 说明没有设置，则需要新增
     if (typeof configObj[key] === 'undefined') {
+      // console.log('key:', key, 'value:', value, `${value}`);
       newContent = newContent.replace('module.exports = {', `module.exports = {
   ${key}: ${val.includes('{') ? val: "'" + val + "'"},`);
     } else if (key === 'coverageThreshold' && coverage !== false) {
@@ -227,7 +240,7 @@ async function updateConfig(jestConfigFilepath, config, { verbose, coverage, sil
 
   !silent && console.log(LABEL, 'jest.config.js exists. Overwrite with:');
 
-  // console.log(newContent.length, newContent);
+  // console.log('newContent.length', newContent.length, newContent);
 
   if (verbose || newContent.length <= 500) !silent && console.log(newContent);
 
@@ -283,6 +296,10 @@ async function newTest() {
 
   await fsp.mkdir(testPath);
   await fsp.writeFile(join(testPath, 'index.test.js'), ut);
+}
+
+async function newBabelConfig(pwd) {
+  return fsp.copyFile(babelConfigFilepath, join(pwd, 'babel.config.js'))
 }
 
 async function updateTSConfig(tsconfigFilepath) {

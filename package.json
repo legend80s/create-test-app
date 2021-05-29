@@ -19,7 +19,7 @@
     "jest:no-cov": "jest ./test/utils",
     "test": "npm run jest && npm run test:js && npm run test:ts && npm run test:empty",
     "test:empty": "rm -rf empty-project && mkdir empty-project && cd empty-project && node ../ && cd -",
-    "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 && npm test && cd -",
+    "test:js": "cd test/e2e-js && node ../../ --type js --coverage=70 --transform='{ sjs: \"babel-jest\" }' && npm test && cd -",
     "test:ts:silent": "cd test/e2e-ts && node ../../ --type ts --silent && npm test && cd -",
     "test:ts": "cd test/e2e-ts && node ../../ --type ts && npm test && cd -"
   },
@@ -51,6 +51,7 @@
     "cli-aid": "^6.4.0",
     "command-exists": "^1.2.9",
     "fs-extra": "^10.0.0",
-    "has-yarn": "^2.1.0"
+    "has-yarn": "^2.1.0",
+    "json5": "^2.2.0"
   }
 }
