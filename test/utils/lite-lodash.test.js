@@ -110,5 +110,14 @@ describe('lite-lodash', () => {
 
       expect(actual).toEqual(expected);
     });
+
+    it('Should return a new shallow copy when not patch provied', () => {
+      const input = { name: 'foo' };
+      const actual = merge(input);
+      const expected = { name: 'foo' };
+
+      expect(actual === input).toEqual(false);
+      expect(actual).toEqual(expected);
+    });
   });
 });
