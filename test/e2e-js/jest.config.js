@@ -1,8 +1,4 @@
 module.exports = {
-  transform: {
-    "^.+\\.(js)$": "babel-jest",
-    "^.+\\.(sjs)$": "babel-jest",
-  },
   preset: '',
   testEnvironment: 'node',
 
@@ -14,6 +10,10 @@ module.exports = {
       functions: 70,
       lines: 70,
       statements: 70
-    }
+    },
+  },
+  transform: {
+    "^.+\\.(js)$": "babel-jest",
+    "^.+\\.(sjs)$": "babel-jest",
   },
 }
