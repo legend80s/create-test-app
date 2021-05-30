@@ -21,18 +21,26 @@ For JavaScript project:
 npx create-test-app
 ```
 
+Files to be modified or created.
+
+1. package.json
+2. jest.config.js
+3. babel.config.js
+4. test/: auto generate test
+5. won't modify tsconfig.json but auto mapping `paths` to jest's `moduleNameMapper`
+
 ## Advanced
 
-set coverage to 50 and and enable import alias in test file.
+set coverage to 50 and and add jest `transform`.
 
 ```sh
-npx create-test-app --type ts --coverage 50 --alias-prefix='@/'
+npx create-test-app --type ts --coverage 50 --transform="{ vue: 'vue-jest' }"
 ```
 
 ```diff
-+  'moduleNameMapper': {
-+    '^@/(.*)': '<rootDir>/src/$1',
-+  },
+  'transform': {
++    '^.+\\.(vue)$': 'vue-jest',
+  },
 ```
 
 ## How it works
