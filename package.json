@@ -15,6 +15,10 @@
   "scripts": {
     "preversion": "npm test",
     "postversion": "npm publish && git push && git push --tags",
+    "pub:major": "npm version major",
+    "pub:minor": "npm version minor",
+    "pub:patch": "npm version patch",
+
     "jest": "jest --coverage ./test/utils",
     "jest:no-cov": "jest ./test/utils",
     "test": "npm run jest && npm run test:js && npm run test:ts && npm run test:empty",
