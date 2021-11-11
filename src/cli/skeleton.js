@@ -59,7 +59,7 @@ async function createTestSkeleton(options) {
     jsconfigFilepathRaw
   ;
 
-  !silent && console.log(LABEL, 'Project root:', chalk.green(packageCwd));
+  !silent && console.log(LABEL, 'Project root:', chalk.green(briefPath(packageCwd)));
 
   const timeLabel = `${LABEL} create test skeleton for ${TYPE_MAPPING[type]} project costs`
   console.time(timeLabel)
@@ -266,7 +266,7 @@ function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
   }
 }
 
-const ut = `/** TODO: YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
+const ut = `/** FIXME: YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
 describe('lite-lodash', () => {
   describe('isPromise', () => {
     it('Should Promise.resolve be a promise', () => {
