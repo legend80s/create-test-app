@@ -1,6 +1,6 @@
 {
   "name": "create-test-app",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "A scaffolding CLI to make your project tested by Jest and with coverage enabled.",
   "keywords": [
     "jest",
@@ -18,7 +18,6 @@
     "pub:major": "npm version major",
     "pub:minor": "npm version minor",
     "pub:patch": "npm version patch",
-
     "jest": "jest --coverage ./test/utils",
     "jest:no-cov": "jest ./test/utils",
     "test": "npm run jest && npm run test:js && npm run test:ts && npm run test:empty",
