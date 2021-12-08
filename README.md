@@ -159,6 +159,9 @@ All the same without `npx ts-jest config:init`.
 npm test
 ```
 
+## TODO
+- [ ] UX improvement: auto check whether it is a TS project
+
 ## Author
 
 👤 **legend80s**
