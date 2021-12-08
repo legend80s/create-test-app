@@ -1,11 +1,12 @@
 <h1 align="center">Welcome to create-test-app 👋</h1>
 
 > Armed your project with Jest.
+>
 > A opinionated scaffolding CLI to make your project tested by Jest and with coverage enabled.
 
 ## Why
 
-Because configure Jest and coverage is tedious 🤕.
+Because configure Jest and coverage is tedious 🤕. **Just do one line cmd 🚀, everythings is configured for U ❤️！**
 
 ## Use
 
@@ -20,6 +21,8 @@ For JavaScript project:
 ```sh
 npx create-test-app
 ```
+
+**DONE!**
 
 Files to be modified or created.
 
