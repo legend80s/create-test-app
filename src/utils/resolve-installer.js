@@ -1,12 +1,17 @@
 const commandExistsSync = require('command-exists').sync;
 
+/**
+ *
+ * @returns {'tnpm'|'npm'|'yarn'}
+ */
 exports.resolveInstallerName = () => {
-  const packageManagerName = commandExistsSync('tnpm') ?
-    'tnpm' :
-    (commandExistsSync('yarn') && hasYarn(packageCwd) ?
-      'yarn' :
-      'npm'
-    )
+  if (commandExistsSync('tnpm')) {
+    return 'tnpm'
+  }
 
-  return packageManagerName;
+  if (commandExistsSync('yarn') && hasYarn(packageCwd)) {
+    return 'yarn'
+  }
+
+  return 'npm';
 }

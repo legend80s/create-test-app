@@ -16,6 +16,7 @@
   },
   "scripts": {
     "build": "npm test && echo building",
+    "pretest": "pnpm i",
     "test": "jest --coverage"
   },
   "keywords": [],
