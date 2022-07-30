@@ -267,23 +267,21 @@ function prependToScript(pkg, scriptKey, scriptVal, { force = false } = {}) {
 }
 
 const ut = `/** FIXME: YOU SHOULD MODIFY ME TO MAKE THE TEST PASS. */
-describe('lite-lodash', () => {
-  describe('isPromise', () => {
-    it('Should Promise.resolve be a promise', () => {
-      const input = Promise.resolve();
-      const actual = isPromise(input);
-      const expected = true;
+describe('isPromise', () => {
+  it('\`Promise.resolve()\` should be a promise', () => {
+    const input = Promise.resolve();
+    const actual = isPromise(input);
+    const expected = true;
 
-      expect(actual).toEqual(expected);
-    });
+    expect(actual).toEqual(expected);
+  });
 
-    it('Should number not a promise', () => {
-      const input = 100;
-      const actual = isPromise(input);
-      const expected = false;
+  it('\`number\` should not a promise', () => {
+    const input = 100;
+    const actual = isPromise(input);
+    const expected = false;
 
-      expect(actual).toEqual(expected);
-    });
+    expect(actual).toEqual(expected);
   });
 });
 `

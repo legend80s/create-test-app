@@ -6,7 +6,9 @@
 
 ## Why
 
-Because configure Jest and coverage is tedious 🤕. **Just do one line cmd 🚀, everythings is configured for U ❤️！**
+Because configure Jest and set coverage is tedious 🤕.
+
+**Just with one line cmd 🚀, everything is configured for U ❤️！**
 
 ## Use
 
@@ -117,31 +119,27 @@ package.json
 md test && cd test && touch lite-lodash.test.ts
 ```
 
-lite-lodash.test.js
-
 ```javascript
+// lite-lodash.test.js
 import { isPromise } from '../src/lib/lite-lodash'
 
-describe('lite-lodash', () => {
-  describe('isPromise', () => {
-    it('should Promise.resolve be a promise', () => {
-      const input = Promise.resolve();
-      const actual = isPromise(input);
-      const expected = true;
+describe('isPromise', () => {
+  it('`Promise.resolve()` should be a promise', () => {
+    const input = Promise.resolve();
+    const actual = isPromise(input);
+    const expected = true;
 
-      expect(actual).toEqual(expected);
-    });
+    expect(actual).toEqual(expected);
+  });
 
-    it('should new Promise be a promise', () => {
-      const input = new Promise(() => {});
-      const actual = isPromise(input);
-      const expected = true;
+  it('`new Promise` should be a promise', () => {
+    const input = new Promise(() => {});
+    const actual = isPromise(input);
+    const expected = true;
 
-      expect(actual).toEqual(expected);
-    });
+    expect(actual).toEqual(expected);
   });
 });
-
 ```
 
 *from [Jest 运行 TypeScript 单测并增加覆盖率](https://juejin.cn/post/6953072509021323278).*
