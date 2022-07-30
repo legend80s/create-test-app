@@ -168,7 +168,7 @@ npm test
 
 👤 **legend80s**
 
-* Github: [@legend80s](https://github.com/legend80s)
+- Github: [@legend80s](https://github.com/legend80s)
 
 ## Show your support
 
