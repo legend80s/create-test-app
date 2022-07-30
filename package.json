@@ -1,6 +1,6 @@
 {
   "name": "create-test-app",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "A scaffolding CLI to make your project tested by Jest and with coverage enabled.",
   "keywords": [
     "jest",
