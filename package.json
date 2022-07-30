@@ -31,8 +31,7 @@
     "cta": "src/index.js"
   },
   "tnpm": {
-    "mode": "yarn",
-    "lockfile": "enable"
+    "mode": "yarn"
   },
   "repository": {
     "type": "git",
